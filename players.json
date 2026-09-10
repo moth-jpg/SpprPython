@@ -1,0 +1,19 @@
+{
+    "players": [
+        {
+            "id": "1",
+            "username": "Alice madness",
+            "score": 100
+        },
+        {
+            "id": "2",
+            "username": "Bobfish",
+            "score": 150
+        },
+        {
+            "id": "3",
+            "username": "Charlie",
+            "score": 120
+        }
+    ]
+}
