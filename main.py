@@ -1,8 +1,19 @@
 from player_class import player
 import json
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Player(BaseModel):
+    id: int
+    username: str
+    score: int
+
 
 menu = {}
-players = json.loads('{"players": []}')
+players = {}
 
 menu['1'] = "Add Player."
 menu['2'] = "Delete Player."
@@ -10,6 +21,40 @@ menu['3'] = "Customize Player."
 menu['4'] = "Find Player."
 menu['5'] = "Show LeaderBoard"
 menu['6'] = "Exit"
+
+
+@app.get("/players")
+def get_players():
+    with open("players.json", "r") as file:
+     data = json.load(file)
+
+    return data["players"]
+
+@app.get("/players/{id}")
+def get_player(id: str):
+    with open("players.json", "r") as file:
+        data = json.load(file)
+
+    for player in data["players"]:
+        if player["id"] == id:
+            return player
+
+    raise HTTPException(status_code=404, detail="Player not found")
+
+@app.get("/leaderboard")
+def get_leaderboard():
+    with open("players.json", "r") as file:
+        data = json.load(file)
+
+    # Sorteer de lijst met spelers op basis van 'score' van hoog naar laag
+    sorted_players = sorted(
+        data["players"], 
+        key=lambda p: int(p["score"]), 
+        reverse=True
+    )
+
+    return sorted_players
+
 
 def add_player():
     while True:
@@ -65,23 +110,26 @@ def show_leaderboard():
     for i, player in enumerate(players, start=1):
         print(f"{i}. {player['username']} - {player['score']}")
 
-while True:
-    options = sorted(menu.keys())
+        
 
-    for entry in options:
-        print(entry, menu [entry])
-    selection = input("Please Select: ")
-    if selection == '1':
-        add_player()
-    elif selection == '2':
-        delete_player()
-    elif selection == '3':
-        customize_player()
-    elif selection == '4':
-        find_player()
-    elif selection == '5':
-        show_leaderboard()
-    elif selection == '6':
-        break
-    else:
-        print("Unknown Option Selected!")
+if __name__ == "__main__":
+    while True:
+        options = sorted(menu.keys())
+
+        for entry in options:
+            print(entry, menu [entry])
+        selection = input("Please Select: ")
+        if selection == '1':
+            add_player()
+        elif selection == '2':
+            delete_player()
+        elif selection == '3':
+            customize_player()
+        elif selection == '4':
+            find_player()
+        elif selection == '5':
+            show_leaderboard()
+        elif selection == '6':
+            break
+        else:
+            print("Unknown Option Selected!")
